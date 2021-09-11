@@ -17,6 +17,11 @@ func TestTagParser_Parse(t1 *testing.T) {
 			want:     &TagSelector{tag: "section"},
 		},
 		{
+			name:     "parse a basic tag with escaped letter",
+			selector: `s\ection`,
+			want:     &TagSelector{tag: "section"},
+		},
+		{
 			name:     "parse a basic tag with \\n",
 			selector: "sect\nion",
 			want:     &TagSelector{tag: "section"},

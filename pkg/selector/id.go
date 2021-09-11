@@ -46,7 +46,7 @@ func (i IdParser) Parse() (Sel, error) {
 		char := i.sel[i.pos]
 
 		switch {
-		case i.isValidIdentifierChar(char): // get current "i" if is a valid name character
+		case i.isValidTagNameChar(char): // get current "i" if is a valid name character
 			id += string(char)
 			i.pos++
 			break
@@ -57,7 +57,13 @@ func (i IdParser) Parse() (Sel, error) {
 			}
 			id += c
 			break
-		case char == ' ':
+		case char == '\r':
+			i.pos++
+			if i.sel[i.pos] == '\n' {
+				i.pos++ // for end of lines \r\n
+			}
+			break
+		case char == ' ' || char == '\n' || char == '\t':
 			i.pos++
 			break
 		}

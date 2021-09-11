@@ -25,7 +25,7 @@ type SelParser struct {
 func (s *SelParser) parseEscape() (string, error) {
 	if '\\' != s.sel[s.pos] {
 		return "", fmt.Errorf("expected escape element (\\), found '%c'", s.sel[s.pos])
-	}	
+	}
 	s.pos++
 
 	start := s.pos // this is for the pattern "\000026" and also works with "\26 "
@@ -35,6 +35,11 @@ func (s *SelParser) parseEscape() (string, error) {
 
 	var i int
 	for i = start; i < start+6 && i < s.selLen && s.isHexChar(s.sel[i]); i++ {
+	}
+
+	if i-start < 6 && s.sel[i] != ' ' {
+		s.pos += i - start
+		return s.sel[start:i], nil
 	}
 
 	v, err := strconv.ParseUint(s.sel[start:i], 16, 21)
