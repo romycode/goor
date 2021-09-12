@@ -86,3 +86,11 @@ func TestAttributeParser_Parse(t *testing.T) {
 		)
 	}
 }
+
+func BenchmarkAttributeParser_Parse(b *testing.B) {
+	parser := NewAttributeParser(`[key]`)
+
+	for i := 0; i < b.N; i++ {
+		parser.Parse()
+	}
+}
