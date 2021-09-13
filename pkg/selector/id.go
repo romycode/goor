@@ -13,7 +13,9 @@ type IdSelector struct {
 func (t IdSelector) Match(n *html.Node) bool {
 	if html.ElementNode == n.Type {
 		for _, attr := range n.Attr {
-			if "key" == attr.Key && t.id == attr.Val {
+			if "id" == attr.Key && t.id == attr.Val {
+				fmt.Println(attr.Val, t.id)
+
 				return true
 			}
 		}

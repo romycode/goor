@@ -18,63 +18,36 @@ func (t AttrSelector) Match(n *html.Node) bool {
 		for _, attr := range n.Attr {
 			switch t.op {
 			case "=":
-				if t.key == attr.Key {
-					values := strings.Split(attr.Val, " ")
-					for _, value := range values {
-						if t.val == value {
-							return true
-						}
-					}
+				if t.key == attr.Key && t.val == attr.Val {
+					return true
 				}
 				return false
-				break
-			case "~=":
-				if t.key == attr.Key {
-					values := strings.Split(attr.Val, " ")
-					for _, value := range values {
-						if t.val == value {
-							return true
-						}
-					}
+			case "~=", "*=":
+				if t.key == attr.Key && strings.Contains(attr.Val, t.val) {
+					return true
 				}
 				return false
-				break
 			case "|=":
 				if t.key == attr.Key {
-					if strings.Index(attr.Val, t.val) == 0 {
+					if attr.Val == t.val || len(attr.Val) >= len(t.val) && attr.Val[:len(t.val)+1] == t.val+"-" {
 						return true
 					}
 				}
 				return false
-				break
 			case "^=":
 				if t.key == attr.Key {
-					value := attr.Val[:len(attr.Val)]
-
-					if value == attr.Val {
+					if attr.Val[:len(t.val)] == t.val {
 						return true
 					}
 				}
 				return false
-				break
 			case "$=":
 				if t.key == attr.Key {
-					value := attr.Val[len(attr.Val)-len(t.val):]
-
-					if value == attr.Val {
+					if attr.Val[len(attr.Val)-len(t.val):] == t.val {
 						return true
 					}
 				}
 				return false
-				break
-			case "*=":
-				if t.key == attr.Key {
-					if strings.Contains(attr.Val, t.val) {
-						return true
-					}
-				}
-				return false
-				break
 			default:
 				if t.key == attr.Key {
 					return true

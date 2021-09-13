@@ -13,7 +13,7 @@ type ClassSelector struct {
 func (t ClassSelector) Match(n *html.Node) bool {
 	if html.ElementNode == n.Type {
 		for _, attr := range n.Attr {
-			if "key" == attr.Key && t.class == attr.Val {
+			if "class" == attr.Key && t.class == attr.Val {
 				return true
 			}
 		}

@@ -52,7 +52,7 @@ func (s *SelParser) parseEscape() (string, error) {
 	return string(rune(v)), nil
 }
 
-// isValidTagNameChar checks if is valid character for tag name
+// isValidTagNameChar checks if is valid character for id name
 // as defined in https://html.spec.whatwg.org/dev/syntax.html#syntax-tag-name
 func (s SelParser) isValidTagNameChar(char byte) bool {
 	return 'a' <= char && char <= 'z' || 'A' <= char && char <= 'Z' || '0' <= char && char <= '9'

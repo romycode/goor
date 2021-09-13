@@ -30,7 +30,7 @@ func NewTagParser(sel string) *TagParser {
 
 func (t *TagParser) Parse() (Sel, error) {
 	if !(t.isValidTagNameChar(t.sel[t.pos]) || t.sel[t.pos] == '\\') {
-		return nil, fmt.Errorf("expected tag selector (key), found '%c'", t.sel[t.pos])
+		return nil, fmt.Errorf("expected id selector (key), found '%c'", t.sel[t.pos])
 	}
 
 	tag := ""

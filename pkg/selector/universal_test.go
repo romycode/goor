@@ -2,10 +2,13 @@ package selector
 
 import (
 	"reflect"
+	"strings"
 	"testing"
+
+	"golang.org/x/net/html"
 )
 
-func TestUniversalParser_Parse(t1 *testing.T) {
+func TestUniversalParser_Parse(t *testing.T) {
 	tests := []struct {
 		name     string
 		selector string
@@ -16,7 +19,7 @@ func TestUniversalParser_Parse(t1 *testing.T) {
 		{name: "throw error for bad universal selector", selector: "a", want: nil, wantErr: true},
 	}
 	for _, tt := range tests {
-		t1.Run(tt.name, func(t1 *testing.T) {
+		t.Run(tt.name, func(t1 *testing.T) {
 			t := NewUniversalParser(tt.selector)
 			got, err := t.Parse()
 			if (err != nil) != tt.wantErr {
@@ -25,6 +28,32 @@ func TestUniversalParser_Parse(t1 *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t1.Errorf("Parse() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUniversalParser_Match(t *testing.T) {
+	tests := []struct {
+		name string
+		html string
+		want bool
+	}{
+		{
+			name: "parse a good universal selector",
+			html: "<html><body><h1></h1></body></html>",
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t1 *testing.T) {
+			n, _ := html.Parse(strings.NewReader(tt.html))
+			t := NewUniversalParser("*")
+			got, _ := t.Parse()
+
+			if res := got.Match(n); res != tt.want {
+				t1.Errorf("Match() = %v, want %v", res, tt.want)
+				return
 			}
 		})
 	}
