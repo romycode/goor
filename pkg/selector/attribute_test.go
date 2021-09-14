@@ -26,7 +26,7 @@ func TestAttributeParser_Parse(t *testing.T) {
 		},
 		{
 			name:     "parse a basic attribute sel with =",
-			selector: `[key="val"]`,
+			selector: `[key=val]`,
 			want: &AttrSelector{
 				key: "key",
 				op:  "=",
@@ -45,6 +45,15 @@ func TestAttributeParser_Parse(t *testing.T) {
 		{
 			name:     "parse a basic attribute sel with |=",
 			selector: `[key|="val"]`,
+			want: &AttrSelector{
+				key: "key",
+				op:  "|=",
+				val: "val",
+			},
+		},
+		{
+			name:     "parse a basic attribute sel with |=",
+			selector: `[key|=val]`,
 			want: &AttrSelector{
 				key: "key",
 				op:  "|=",

@@ -74,96 +74,31 @@ func NewAttributeParser(sel string) *AttributeParser {
 
 func (a AttributeParser) Parse() (Sel, error) {
 	if a.sel[a.pos] != '[' {
-		return nil, fmt.Errorf("expected attribute selector ([attr=val]), found '%c'", a.sel[a.pos])
+		return nil, fmt.Errorf("expected attribute selector ([attr=val]), found '%s'", a.sel)
+	}
+	if !strings.ContainsRune(a.sel, ']') {
+		return nil, fmt.Errorf("expected attribute selector ([attr=val]), found '%s'", a.sel)
 	}
 	a.pos++
 
 	key := ""
 	op := ""
-	var val string
+	val := ""
 	for a.pos < a.selLen {
 		char := a.sel[a.pos]
 
 		switch {
 		case a.isValidTagNameChar(char): // get current "i" if is a valid name character
-			key += string(char)
+			if op == "" {
+				key += string(char)
+			} else {
+				val += string(char)
+			}
 			a.pos++
 			break
 		case char == '=':
 			op = string(char)
 			a.pos++
-			break
-		case char == '~':
-			if a.sel[a.pos+1] == '=' {
-				op = a.sel[a.pos : a.pos+2]
-			} else {
-				return nil, fmt.Errorf("expected operation for attribute selector ([~,|,^,$,*]=), found '%s'",
-					a.sel[a.pos:a.pos+2])
-			}
-			a.pos += 2
-			break
-		case char == '|':
-			if a.sel[a.pos+1] == '=' {
-				op = a.sel[a.pos : a.pos+2]
-			} else {
-				return nil, fmt.Errorf("expected operation for attribute selector ([~,|,^,$,*]=), found '%s'",
-					a.sel[a.pos:a.pos+2])
-			}
-			a.pos += 2
-			break
-		case char == '^':
-			if a.sel[a.pos+1] == '=' {
-				op = a.sel[a.pos : a.pos+2]
-			} else {
-				return nil, fmt.Errorf("expected operation for attribute selector ([~,|,^,$,*]=), found '%s'",
-					a.sel[a.pos:a.pos+2])
-			}
-			a.pos += 2
-			break
-		case char == '$':
-			if a.sel[a.pos+1] == '=' {
-				op = a.sel[a.pos : a.pos+2]
-			} else {
-				return nil, fmt.Errorf("expected operation for attribute selector ([~,|,^,$,*]=), found '%s'",
-					a.sel[a.pos:a.pos+2])
-			}
-			a.pos += 2
-			break
-		case char == '*':
-			if a.sel[a.pos+1] == '=' {
-				op = a.sel[a.pos : a.pos+2]
-			} else {
-				return nil, fmt.Errorf("expected operation for attribute selector ([~,|,^,$,*]=), found '%s'",
-					a.sel[a.pos:a.pos+2])
-			}
-			a.pos += 2
-			break
-		case char == '"':
-			a.pos++
-			found := false
-			value := ""
-			for i := a.pos; !found; i++ {
-				char := a.sel[a.pos]
-
-				switch {
-				case a.isValidTagNameChar(char):
-					value += string(char)
-					a.pos++
-					break
-				case char == '"':
-					found = true
-					a.pos++
-					break
-				case char == '\\':
-					c, err := a.parseEscape()
-					if err != nil {
-						return nil, err
-					}
-					value += c
-					break
-				}
-			}
-			val = value
 			break
 		case char == '\\': // sel have an escaped element https://drafts.csswg.org/css-syntax-3/#escaping
 			c, err := a.parseEscape()
@@ -172,13 +107,15 @@ func (a AttributeParser) Parse() (Sel, error) {
 			}
 			key += c
 			break
-		case char == '\r':
-			a.pos++
-			if a.sel[a.pos] == '\n' {
-				a.pos++ // for end of lines \r\n
+		case char == '~' || char == '|' || char == '^' || char == '$' || char == '*':
+			if a.sel[a.pos+1] != '=' {
+				return nil, fmt.Errorf("expected operation for attribute selector ([~,|,^,$,*]=), found '%s'",
+					a.sel[a.pos:a.pos+2])
 			}
+			op = a.sel[a.pos : a.pos+2]
+			a.pos += 2
 			break
-		case char == ' ' || char == '\n' || char == '\t' || char == ']':
+		case char == ' ' || char == '\n' || char == '\r' || char == '\t' || char == ']' || char == '"':
 			a.pos++
 			break
 		}
